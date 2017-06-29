@@ -10,6 +10,7 @@ from mtgsdk import Card
 DEFAULT_DECK_YAML_PATH = "deck.yml"
 DEFAULT_OUTPUT_PATH = "data"
 DEFAULT_DECK_SET = "Revised Edition"
+MAX_CARD_NAME_LENGTH = 42
 
 def load_deck(yaml_path):
     """Load magic deck from YAML file at yaml_path."""
@@ -19,15 +20,14 @@ def load_deck(yaml_path):
 
 def _card_to_path(card, output_path):
     """Generate a file name for a card."""
-    max_card_name_length = 42
     return "{0}/{1}/{1}_{2}_base.jpg".format(output_path,
-                                             card.name[0:max_card_name_length],
+                                             card.name[0:MAX_CARD_NAME_LENGTH],
                                              card.multiverse_id)
 
 def _download_card_image(card, output_path):
     """Download the image of a magic card."""
     if not card.image_url is None:
-        dest_dir = output_path + "/" + card.name
+        dest_dir = output_path + "/" + card.name[0:MAX_CARD_NAME_LENGTH]
         if not os.path.exists(dest_dir):
             os.mkdir(dest_dir)
         urllib.request.urlretrieve(card.image_url,
