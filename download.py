@@ -19,8 +19,9 @@ def load_deck(yaml_path):
 
 def _card_to_path(card, output_path):
     """Generate a file name for a card."""
+    max_card_name_length = 42
     return "{0}/{1}/{1}_{2}_base.jpg".format(output_path,
-                                             card.name,
+                                             card.name[0:max_card_name_length],
                                              card.multiverse_id)
 
 def _download_card_image(card, output_path):
