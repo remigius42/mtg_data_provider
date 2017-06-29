@@ -43,12 +43,23 @@ def _handle_card(card_data, output_path):
     for card in cards_found:
         _download_card_image(card, output_path)
 
+def _download_cards(cards, output_path):
+    """Iterate in parallel over the cards and call handle_card for each."""
+    Parallel(n_jobs=-2)(delayed(_handle_card)(card_data, output_path)
+                        for card_data in cards)
 
 def download_deck(deck, output_path):
-    """Iterate in parallel over the deck and call handle_card for each card."""
-    Parallel(n_jobs=-2)(delayed(_handle_card)(card_data, output_path)
-                        for card_data in deck['cards'])
+    """Download images for a given deck."""
+    _download_cards(deck['cards'], output_path)
+
+def download_set(query_set_name, output_path):
+    """Download images for a given set name."""
+    cards_found = Card.where(set_name=query_set_name).all()
+    Parallel(n_jobs=-2)(delayed(_download_card_image)(card, output_path)
+                        for card in cards_found)
+
 
 if __name__ == '__main__':
-    DECK = load_deck(DEFAULT_DECK_YAML_PATH)
-    download_deck(DECK, DEFAULT_OUTPUT_PATH)
+    #DECK = load_deck(DEFAULT_DECK_YAML_PATH)
+    #download_deck(DECK, DEFAULT_OUTPUT_PATH)
+    download_set("Revised Edition", DEFAULT_OUTPUT_PATH)
