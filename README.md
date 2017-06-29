@@ -1,4 +1,4 @@
-# Magic the Gathering data supplier
+# Magic the Gathering data provider
 Data downloader and generator for "Magic the Gathering (tm)"
 
 # Usage
