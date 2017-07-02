@@ -13,5 +13,5 @@ COPY ["pip-requirements.txt", "/tmp/pip-requirements.txt"]
 RUN ["pip","install","-r","/tmp/pip-requirements.txt"]
 
 WORKDIR /mnt/mtg
-ENTRYPOINT ["python", "main.py", "deck.yml", "data"]
-CMD ["deck.yml", "data"]
+ENTRYPOINT ["python", "main.py"]
+CMD ["-d", "deck.yml", "-o", "data"]
