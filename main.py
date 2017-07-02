@@ -1,7 +1,7 @@
 """Retrieve and preprocess magic card images."""
 import argparse
 import download
-import generate
+import transform
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-d",
@@ -18,4 +18,4 @@ ARGS = PARSER.parse_args()
 
 DECK = download.load_deck(download.DEFAULT_DECK_YAML_PATH)
 download.download_deck(DECK, download.DEFAULT_OUTPUT_PATH)
-generate.generate_images(download.DEFAULT_OUTPUT_PATH)
+transform.rotate_images(download.DEFAULT_OUTPUT_PATH)
