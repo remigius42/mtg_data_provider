@@ -1,6 +1,7 @@
 """Download all images for cards specified in DEFAULT_DECK_YAML_PATH."""
 
 import os.path
+import pickle
 import urllib.request
 import warnings
 from joblib import Parallel, delayed
@@ -11,6 +12,7 @@ DEFAULT_DECK_YAML_PATH = "deck.yml"
 DEFAULT_OUTPUT_PATH = "data"
 DEFAULT_DECK_SET = "Revised Edition"
 MAX_CARD_NAME_LENGTH = 42
+QUERY_RESULT_CACHE_PICKLE_PATH = "query_result.pickle"
 
 def load_deck(yaml_path):
     """Load magic deck from YAML file at yaml_path."""
@@ -53,9 +55,21 @@ def download_deck(deck, output_path):
     """Download images for a given deck."""
     _download_cards(deck['cards'], output_path)
 
-def download_set(query_set_name, output_path):
+def _pickle_query_result(query_result):
+    with open(QUERY_RESULT_CACHE_PICKLE_PATH, "wb") as pickle_file:
+        pickle.dump(query_result, pickle_file, pickle.HIGHEST_PROTOCOL)
+
+def download_set(query_set_name, output_path, use_cache=True):
     """Download images for a given set name."""
-    cards_found = Card.where(set_name=query_set_name).all()
+    if use_cache and os.path.isfile(QUERY_RESULT_CACHE_PICKLE_PATH):
+        with open(QUERY_RESULT_CACHE_PICKLE_PATH, "rb") as pickle_file:
+            cards_found = pickle.load(pickle_file)
+    else:
+        cards_found = Card.where(set_name=query_set_name).all()
+
+    if use_cache:
+        _pickle_query_result(cards_found)
+
     Parallel(n_jobs=-2)(delayed(_download_card_image)(card, output_path)
                         for card in cards_found)
 

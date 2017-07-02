@@ -1,5 +1,6 @@
 # Custom ignores
 .markdown-preview.html
+query_result.pickle
 /data
 
 # Byte-compiled / optimized / DLL files
