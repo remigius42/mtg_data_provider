@@ -30,7 +30,7 @@ def _generate_images(image_path, rotations):
 
 def _get_all_base_images(images_path):
     """Get all base image paths for given images folder."""
-    return glob.glob(images_path + "/**/*_base.jpg")
+    return glob.glob(images_path + "/**/*_base.{jpg,jpeg,png}")
 
 def rotate_images(images_path):
     """Generate rotated images of all base images."""
