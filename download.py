@@ -1,7 +1,9 @@
 """Download all images for cards specified in DEFAULT_DECK_YAML_PATH."""
 
+import imghdr
 import os.path
 import pickle
+import shutil
 import urllib.request
 import warnings
 from joblib import Parallel, delayed
@@ -20,11 +22,11 @@ def load_deck(yaml_path):
         deck = yaml.load(deck_file)
         return deck
 
-def _card_to_path(card, output_path):
-    """Generate a file name for a card."""
-    return "{0}/{1}/{1}_{2}_base.jpg".format(output_path,
-                                             card.name[0:MAX_CARD_NAME_LENGTH],
-                                             card.multiverse_id)
+def _card_to_tmp_path(card, output_path):
+    """Generate a temporary file name for a card without extension."""
+    return "{0}/{1}/{1}_{2}_base".format(output_path,
+                                         card.name[0:MAX_CARD_NAME_LENGTH],
+                                         card.multiverse_id)
 
 def _download_card_image(card, output_path):
     """Download the image of a magic card."""
@@ -32,8 +34,11 @@ def _download_card_image(card, output_path):
         dest_dir = output_path + "/" + card.name[0:MAX_CARD_NAME_LENGTH]
         if not os.path.exists(dest_dir):
             os.mkdir(dest_dir)
-        urllib.request.urlretrieve(card.image_url,
-                                   _card_to_path(card, output_path))
+        download_path = _card_to_tmp_path(card, output_path)
+        urllib.request.urlretrieve(card.image_url, download_path)
+        image_type = imghdr.what(download_path)
+        path_with_image_extension = download_path + "." + image_type
+        shutil.move(download_path, path_with_image_extension)
 
 def _handle_card(card_data, output_path):
     """Look for card in database and download all card images found."""
