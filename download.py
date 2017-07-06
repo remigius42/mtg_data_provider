@@ -12,7 +12,7 @@ from mtgsdk import Card
 
 DEFAULT_DECK_YAML_PATH = "deck.yml"
 DEFAULT_OUTPUT_PATH = "data"
-DEFAULT_DECK_SET = "Revised Edition"
+DEFAULT_SET_CODE = "3ED"
 MAX_CARD_NAME_LENGTH = 42
 QUERY_RESULT_CACHE_PICKLE_PATH = "query_result.pickle"
 
@@ -42,8 +42,7 @@ def _download_card_image(card, output_path):
 
 def _handle_card(card_data, output_path):
     """Look for card in database and download all card images found."""
-    cards_found = Card.where(set_name=DEFAULT_DECK_SET,
-                             name=card_data['name'],
+    cards_found = Card.where(name=card_data['name'],
                              artist=card_data['artist']).all()
     if not cards_found:
         warnings.warn("No cards found for: " + card_data)
@@ -64,13 +63,13 @@ def _pickle_query_result(query_result):
     with open(QUERY_RESULT_CACHE_PICKLE_PATH, "wb") as pickle_file:
         pickle.dump(query_result, pickle_file, pickle.HIGHEST_PROTOCOL)
 
-def download_set(query_set_name, output_path, use_cache=True):
+def download_set(query_set_code, output_path, use_cache=True):
     """Download images for a given set name."""
     if use_cache and os.path.isfile(QUERY_RESULT_CACHE_PICKLE_PATH):
         with open(QUERY_RESULT_CACHE_PICKLE_PATH, "rb") as pickle_file:
             cards_found = pickle.load(pickle_file)
     else:
-        cards_found = Card.where(set_name=query_set_name).all()
+        cards_found = Card.where(set=query_set_code).all()
 
     if use_cache:
         _pickle_query_result(cards_found)
@@ -80,6 +79,4 @@ def download_set(query_set_name, output_path, use_cache=True):
 
 
 if __name__ == '__main__':
-    #DECK = load_deck(DEFAULT_DECK_YAML_PATH)
-    #download_deck(DECK, DEFAULT_OUTPUT_PATH)
-    download_set("Revised Edition", DEFAULT_OUTPUT_PATH)
+    download_set(DEFAULT_SET_CODE, DEFAULT_OUTPUT_PATH)
